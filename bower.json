@@ -1,6 +1,6 @@
 {
   "name": "wid-hex-tile",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
     "Anonymous <anonymous@example.com>"
   ],
@@ -22,7 +22,7 @@
     "polymer": "Polymer/polymer#~1.0.5",
     "neon-animation": "hourliert/neon-animation#~1.0.7",
     "web-animations-js": "2.1.0",
-    "wid-d3-import": "hourliert/wid-d3-import#~1.0.0"
+    "wid-d3-import": "wid-la/wid-d3-import#~1.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
