@@ -180,8 +180,8 @@ Example:
         value: false
       },
 
-      routeUrl: {
-        type: String
+      dataPlain: {
+        type: Object
       }
     },
 
@@ -270,7 +270,7 @@ Example:
      * the event is different.
      * @param  {CustomEvent} e Tap event
      */
-    _onTap: function(e) {
+    _onTap: function() {
       var eventName = 'hex-tile-tap-' + ((this.isPlain) ? 'plain' : 'empty');
 
       this.fire(eventName, {
