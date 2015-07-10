@@ -1,6 +1,6 @@
 {
   "name": "wid-hex-tile",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "authors": [
     "Anonymous <anonymous@example.com>"
   ],
@@ -21,7 +21,6 @@
   "dependencies": {
     "polymer": "Polymer/polymer#~1.0.5",
     "neon-animation": "PolymerElements/neon-animation#~1.0.5",
-    "web-animations-js": "2.1.0",
     "wid-d3-import": "wid-la/wid-d3-import#~1.0.0",
     "paper-styles": "PolymerElements/paper-styles#~1.0.7"
   },
