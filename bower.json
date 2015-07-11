@@ -2,17 +2,19 @@
   "name": "wid-hex-tile",
   "version": "1.0.5",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Thomas Hourlier <hourliert@gmail.com>"
   ],
   "description": "An element providing a solution to no problem in particular.",
   "keywords": [
     "web-component",
+    "web-components",
     "polymer",
-    "seed"
+    "tile",
+    "hexagon"
   ],
   "main": "wid-hex-tile.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "license": "MIT",
+  "homepage": "https://github.com/wid-la/wid-hex-grid",
   "ignore": [
     "/.*",
     "/test/",
