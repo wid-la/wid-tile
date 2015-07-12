@@ -7,7 +7,7 @@
 <link rel="import" href="wid-tiles-store.html">
 
 <!--
-An element that display a hexagonal tile.
+An element that display a tile.
 
 Example:
 
@@ -192,13 +192,13 @@ Example:
     },
 
     /**
-     * Create the svg hexagon with d3 based on the width, the height, the margin
+     * Create the svg hexagon or circle with d3 based on the width, the height, the margin
      * and the color of the component.
      */
     attached: function() {
       var width = this.width,
           radius,
-          id = 'tile',
+          id = 'shape',
           shape = 'circle',
           svg, g, enter, attr, hexbin;
 
@@ -235,7 +235,7 @@ Example:
       Polymer.dom(this.$.tile).insertBefore(svg.node(), this.$.anchor);
 
       //optimization
-      this.$.tile = this.$$('#tile');
+      this.$.shape = this.$$('#' + id);
     },
 
     /**
@@ -287,7 +287,7 @@ Example:
      * @param  {CustomEvent} e Tap event
      */
     _onTap: function() {
-      var eventName = 'hex-tile-tap-' + ((this.isPlain) ? 'plain' : 'empty');
+      var eventName = 'tile-tap-' + ((this.isPlain) ? 'plain' : 'empty');
 
       this.fire(eventName, {
         i: this.i,
@@ -319,7 +319,7 @@ Example:
      * Set the color of the tile whenever the `color` property changes.
      */
     _colorChanged: function() {
-      d3.select(this.$.tile).select('g').select('#hexagon').style('fill', this.color);
+      d3.select(this.$.tile).select('g').select('#shape').style('fill', this.color);
     },
 
     /**
