@@ -1,5 +1,5 @@
 {
-  "name": "wid-hex-tile",
+  "name": "wid-tile",
   "version": "1.0.6",
   "authors": [
     "Thomas Hourlier <hourliert@gmail.com>"
@@ -12,9 +12,9 @@
     "tile",
     "hexagon"
   ],
-  "main": "wid-hex-tile.html",
+  "main": "wid-tile.html",
   "license": "MIT",
-  "homepage": "https://github.com/wid-la/wid-hex-grid",
+  "homepage": "https://github.com/wid-la/wid-grid",
   "ignore": [
     "/.*",
     "/test/",

@@ -12,22 +12,22 @@ An element that display a hexagonal tile.
 Example:
 
 ```
-  <wid-hex-tile
+  <wid-tile
     color="blue"
     width="125"
     height="125">
 
     <span>Hello World!</span>
 
-  </wid-hex-tile>
+  </wid-tile>
 ```
 
 @group Wid
-@element wid-hex-tile
+@element wid-tile
 @demo demo/index.html
 @hero hero.svg
 -->
-<dom-module id="wid-hex-tile">
+<dom-module id="wid-tile">
   <style>
 
     :host {
@@ -97,7 +97,7 @@ Example:
   ];
 
   Polymer({
-    is: 'wid-hex-tile',
+    is: 'wid-tile',
 
     behaviors: [
       Polymer.NeonAnimationRunnerBehavior
@@ -118,6 +118,11 @@ Example:
             }]
           };
         }
+      },
+
+      type: {
+        type: String,
+        value: 'circle'
       },
 
       _neighbors: {
@@ -191,32 +196,46 @@ Example:
      * and the color of the component.
      */
     attached: function() {
-      var width = (Math.sqrt(3) / 2) * this.width,
-          radius = (this.width + this.height) / 4;
+      var width = this.width,
+          radius,
+          id = 'tile',
+          shape = 'circle',
+          svg, g, enter, attr, hexbin;
 
-      var svg = d3.select('body').append('svg')
+      if (this.type === 'hexagon') {
+        width = (Math.sqrt(3) / 2) * this.width;
+        shape = 'path';
+      }
+
+      radius = (this.width + this.height) / 4;
+      hexbin = d3.hexbin()
+        .radius(radius);
+
+      svg = d3.select('body').append('svg')
           .remove()
           .attr('width', width)
           .attr('height', this.height)
           .attr('class', 'fit');
-
-      var g = svg.append('g')
+      g = svg.append('g')
           .attr('transform', 'translate(' + width / 2 + ',' + this.height / 2 + ')');
+      enter = g.selectAll('#' + id)
+                .data(hexbin([[0,0]]))
+              .enter().append(shape)
+                .attr('id', id);
+      if (this.type === 'hexagon') {
+        attr = enter.attr('d', hexbin.hexagon(radius - this.margin));
+      } else {
+        attr = enter.attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", radius - this.margin);
+      }
+      attr.style('fill', this.color);
 
-      var hexbin = d3.hexbin()
-        .radius(radius);
-
-      g.selectAll('#hexagon')
-          .data(hexbin([[0,0]]))
-        .enter().append('path')
-          .attr('id', 'hexagon')
-          .attr('d', hexbin.hexagon(radius - this.margin))
-          .style('fill', this.color);
 
       Polymer.dom(this.$.tile).insertBefore(svg.node(), this.$.anchor);
 
       //optimization
-      this.$.hexagon = this.$$('#hexagon');
+      this.$.tile = this.$$('#tile');
     },
 
     /**
@@ -281,7 +300,7 @@ Example:
      * @return {Number} Width
      */
     _widthChanged: function() {
-      var width = (Math.sqrt(3) / 2) * this.width;
+      var width = ((this.type === 'hexagon') ? ((Math.sqrt(3) / 2) * this.width) : this.width);
 
       this.style.width = isNaN(this.width) ? width : width + 'px';
       return width;

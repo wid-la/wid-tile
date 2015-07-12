@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<link rel="import" href="wid-hex-tile.html">
+<link rel="import" href="wid-tile.html">
 
 <!--
 An element that display store a set of hexagonal tiles.
@@ -110,7 +110,7 @@ Example:
       try {
         return this.tilesXyz[x][y][z];
       } catch (e) {
-        var emptyTile = document.createElement('wid-hex-tile');
+        var emptyTile = document.createElement('wid-tile');
 
         emptyTile.x = x;
         emptyTile.y = y;
@@ -136,7 +136,7 @@ Example:
      try {
         return this.tilesIj[i][j];
       } catch (e) {
-        var emptyTile = document.createElement('wid-hex-tile');
+        var emptyTile = document.createElement('wid-tile');
 
         emptyTile.i = i;
         emptyTile.j = j;
