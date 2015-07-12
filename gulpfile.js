@@ -8,7 +8,7 @@ var tag_version = require('gulp-tag-version');
 var filter = require('gulp-filter');
 
 var POLYSERVE_PORT = 8080,
-    elementName = 'wid-hex-tile';
+    elementName = 'wid-tile';
 
 var browserSyncConfig = function(path, cb) {
   bs.init({
