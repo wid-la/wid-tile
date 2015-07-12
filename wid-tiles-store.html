@@ -5,7 +5,7 @@
 <!--
 An element that display store a set of hexagonal tiles.
 The store is indexed twice. Once with the cube layout and once with the
-even-q layout. 
+even-q layout.
 
 Example:
 
@@ -25,16 +25,21 @@ Example:
     is: 'wid-tiles-store',
 
     properties: {
+      type: {
+        type: String,
+        value: 'circle'
+      },
+
       tilesXyz: {
         type: Array,
         notify: true,
-        value: []
+        value: {}
       },
 
       tilesIj: {
         type: Array,
         notify: true,
-        value: []
+        value: {}
       }
     },
 
@@ -77,9 +82,10 @@ Example:
     _addTileIJ: function (tile) {
       var pos = this._getPositions(tile);
 
-      this.tilesIj[pos.i] = this.tilesIj[pos.i] || [];
-      this.tilesIj[pos.i][pos.j] = this.tilesIj[pos.i][pos.j] || [];
-      this.set('tilesIj.' + pos.i + '.' + pos.j, tile);
+      this.tilesIj[this.type] = this.tilesIj[this.type] || [];
+      this.tilesIj[this.type][pos.i] = this.tilesIj[this.type][pos.i] || [];
+      this.tilesIj[this.type][pos.i][pos.j] = this.tilesIj[this.type][pos.i][pos.j] || [];
+      this.set('tilesIj.' + this.type + '.' + pos.i + '.' + pos.j, tile);
 
     },
 
@@ -90,10 +96,11 @@ Example:
     _addTileXYZ: function (tile) {
       var pos = this._getPositions(tile);
 
-      this.tilesXyz[pos.x] = this.tilesXyz[pos.x] || [];
-      this.tilesXyz[pos.x][pos.y] = this.tilesXyz[pos.x][pos.y] || [];
-      this.tilesXyz[pos.x][pos.y][pos.z] = this.tilesXyz[pos.x][pos.y][pos.z] || [];
-      this.set('tilesXyz.' + pos.x + '.' + pos.y + '.' + pos.z, tile);
+      this.tilesXyz[this.type] = this.tilesXyz[this.type] || [];
+      this.tilesXyz[this.type][pos.x] = this.tilesXyz[this.type][pos.x] || [];
+      this.tilesXyz[this.type][pos.x][pos.y] = this.tilesXyz[this.type][pos.x][pos.y] || [];
+      this.tilesXyz[this.type][pos.x][pos.y][pos.z] = this.tilesXyz[this.type][pos.x][pos.y][pos.z] || [];
+      this.set('tilesXyz.' + [this.type] + '.' + pos.x + '.' + pos.y + '.' + pos.z, tile);
 
     },
 
@@ -108,13 +115,14 @@ Example:
      */
     getTileXYZ: function (x, y, z) {
       try {
-        return this.tilesXyz[x][y][z];
+        return this.tilesXyz[this.type][x][y][z];
       } catch (e) {
         var emptyTile = document.createElement('wid-tile');
 
         emptyTile.x = x;
         emptyTile.y = y;
         emptyTile.z = z;
+        emptyTile.type = this.type;
         emptyTile.isFake = true;
         emptyTile._store = this;
 
@@ -134,13 +142,14 @@ Example:
      */
     getTileIJ: function (i, j) {
      try {
-        return this.tilesIj[i][j];
+        return this.tilesIj[this.type][i][j];
       } catch (e) {
         var emptyTile = document.createElement('wid-tile');
 
         emptyTile.i = i;
         emptyTile.j = j;
         emptyTile.isFake = true;
+        emptyTile.type = this.type;
         emptyTile._store = this;
 
         this.addTile(emptyTile);
