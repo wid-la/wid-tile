@@ -33,9 +33,7 @@ Example:
     :host {
       display: block;
       cursor: pointer;
-      pointer-event
       background-color: transparent;
-      opacity: 1;
     }
 
     #anchor {
@@ -58,14 +56,15 @@ Example:
     }
 
     #tile ::content iron-image {
-      width: 48px;
-      height: 48px;
+      width: var(--wid-tile-image-width, 96px);
+      height: var(--wid-tile-image-height, 96px);
+      opacity: var(--wid-tile-image-opacity, 0.5);
       position: relative;
     }
 
-    #tile ::content span {
-      font-size: 20px;
-      position: relative;
+    #tile-name {
+      font-size: var(--wid-tile-image-font-size, 20px);
+      color: var(--wid-tile-image-text-color, white);
     }
 
   </style>
@@ -78,8 +77,12 @@ Example:
       hidden$="[[_hidden]]">
 
       <span id="anchor"></span>
+
       <content select="iron-image"></content>
-      <content select="span"></content>
+
+      <div id="tile-name" class="fit layout vertical center-center" hidden$="[[!_isOvered(_hasMouseOver)]]">
+        <content select="span"></content>
+      </div>
       <content></content>
 
     </div>
@@ -103,6 +106,11 @@ Example:
     ],
 
     properties: {
+      displayTitleOnOver: {
+        type: Boolean,
+        value: false
+      },
+
       animationConfig: {
         value: function() {
           return {
@@ -183,11 +191,34 @@ Example:
       isFake: {
         type: Boolean,
         value: false
+      },
+
+      _hasMouseOver: {
+        type: Boolean,
+        value: false
       }
     },
 
     listeners: {
-      tap: '_onTap'
+      tap: '_onTap',
+      mouseenter: '_onMouseEnter',
+      mouseleave: '_onMouseLeave'
+    },
+
+    _onMouseEnter: function () {
+      if (this.displayTitleOnOver) {
+        this._hasMouseOver = true;
+      }
+    },
+
+    _onMouseLeave: function () {
+      if (this.displayTitleOnOver) {
+        this._hasMouseOver = false;
+      }
+    },
+
+    _isOvered: function () {
+      return this.isPlain && this._hasMouseOver;
     },
 
     /**
@@ -287,6 +318,8 @@ Example:
      */
     _onTap: function() {
       var eventName = 'tile-tap-' + ((this.isPlain) ? 'plain' : 'empty');
+
+      this._hasMouseOver = false;
 
       this.fire(eventName, {
         i: this.i,
