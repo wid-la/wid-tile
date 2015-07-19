@@ -80,7 +80,11 @@ Example:
 
       <content select="iron-image"></content>
 
-      <div id="tile-name" class="fit layout vertical center-center" hidden$="[[!_isOvered(_hasMouseOver)]]">
+      <div
+        id="tile-name"
+        class="fit layout vertical center-center"
+        style$="[[_computeSpanStyle(textColor)]]"
+        hidden$="[[!_isOvered(_hasMouseOver)]]">
         <content select="span"></content>
       </div>
       <content></content>
@@ -106,6 +110,12 @@ Example:
     ],
 
     properties: {
+
+      textColor: {
+        type: String,
+        value: 'white'
+      },
+
       displayTitleOnOver: {
         type: Boolean,
         value: false
@@ -219,6 +229,10 @@ Example:
 
     _isOvered: function () {
       return this.isPlain && this._hasMouseOver;
+    },
+
+    _computeSpanStyle: function () {
+      return 'color: ' + this.textColor + ';';
     },
 
     /**
