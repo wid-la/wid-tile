@@ -67,6 +67,12 @@ Example:
       color: var(--wid-tile-image-text-color, white);
     }
 
+    #pulse {
+      background-color: var(--wid-tile-pulse-background-color, #A6DDF9);
+      opacity: 0;
+      border-radius: 50% 50%;
+    }
+
   </style>
   <template>
     <wid-tiles-store id="store" type="[[type]]"></wid-tiles-store>
@@ -78,13 +84,15 @@ Example:
 
       <span id="anchor"></span>
 
+      <div id="pulse" class="fit"></div>
+
       <content select="iron-image"></content>
 
       <div
         id="tile-name"
         class="fit layout vertical center-center"
         style$="[[_computeSpanStyle(textColor)]]"
-        hidden$="[[!_isOvered(_hasMouseOver)]]">
+        hidden$="[[!_hasMouseOver]]">
         <content select="span"></content>
       </div>
       <content></content>
@@ -111,16 +119,10 @@ Example:
 
     properties: {
 
-      textColor: {
-        type: String,
-        value: 'white'
-      },
-
-      displayTitleOnOver: {
-        type: Boolean,
-        value: false
-      },
-
+      /**
+       * Animation Configuration
+       * @type {Object}
+       */
       animationConfig: {
         value: function() {
           return {
@@ -137,75 +139,191 @@ Example:
         }
       },
 
+      /**
+       * Text color. (For the title)
+       * @type {Object}
+       */
+      textColor: {
+        type: String,
+        value: 'white'
+      },
+
+      /**
+       * Whether display the tile title when the tile is overed.
+       * @type {Boolean}
+       */
+      displayTitleOnOver: {
+        type: Boolean
+      },
+
+      /**
+       * Type of tile. Whether `circle` or `hexagon`
+       * @type {String}
+       */
       type: {
         type: String,
         value: 'circle'
       },
 
+      /**
+       * The tiles neighbors.
+       * @type {Object}
+       */
       _neighbors: {
         type: Array
       },
 
+      /**
+       * Tile x coordinate.
+       * @type {Number}
+       */
       x: {
         type: Number
       },
 
+      /**
+       * Tile y coordinate.
+       * @type {Number}
+       */
       y: {
         type: Number
       },
 
+      /**
+       * Tile z coordinate.
+       * @type {Number}
+       */
       z: {
         type: Number
       },
 
+      /**
+       * Tile i coordinate.
+       * @type {Number}
+       */
       i: {
         type: Number
       },
 
+      /**
+       * Tile j coordinate.
+       * @type {Number}
+       */
       j: {
         type: Number
       },
 
+      /**
+       * The tile background color.
+       * @type {String}
+       */
       color: {
         type: String,
         value: '#f0f',
         observer: '_colorChanged'
       },
 
+      /**
+       * The tile width.
+       * @type {Number}
+       */
       width: {
         type: Number,
         value: 150,
         observer: '_widthChanged'
       },
 
+      /**
+       * The tile height.
+       * @type {Number}
+       */
       height: {
         type: Number,
         value: 150,
         observer: '_heightChanged'
       },
 
+      /**
+       * The margin between the component border and the shape (circle or hexagon).
+       * @type {Number}
+       */
       margin: {
         type: Number,
         value: 1
       },
 
-      isPlain: {
-        type: Boolean
-      },
-
+      /**
+       * The margin top of the component. Equivalent to the margin-top css property.
+       * @type {Number}
+       */
       marginTop: {
         type: Number,
         observer: '_marginTopChanged'
       },
 
-      isFake: {
+      /**
+       * The tile is currently overed.
+       * @type {Boolean}
+       */
+      _hasMouseOver: {
         type: Boolean,
         value: false
       },
 
-      _hasMouseOver: {
+      /**
+       * Whether or not play the pulse animation.
+       * @type {Boolean}
+       */
+      pulseAnimation: {
         type: Boolean,
         value: false
+      },
+
+      /**
+       * Pulse animation config.
+       * @type {Object}
+       */
+      pulseAnimationSteps: {
+        type: Array,
+        value: function () {
+          return [
+            {opacity: '0.1', transform: 'scale(0)'},
+            {opacity: '0.35', transform: 'scale(0.7)'}
+          ];
+        }
+      },
+
+      /**
+       * Pulse animation timing config.
+       * @type {Object}
+       */
+      pulseAnimationTiming: {
+        type: Object,
+        value: function () {
+          return {
+            direction: 'alternate',
+            duration: 800,
+            iterations: Infinity,
+            easing: 'ease-in-out'
+          };
+        }
+      },
+
+      /**
+       * The pulse animation object constructed by web-animations-js.
+       * @type {Object}
+       */
+      _pulseAnimation: {
+        type: Object
+      },
+
+      /**
+       * Whether or not pulse fastly when the tile is overed.
+       * @type {Boolean}
+       */
+      pulseFasterOnOver: {
+        type: Number,
+        value: 2
       }
     },
 
@@ -215,31 +333,78 @@ Example:
       mouseleave: '_onMouseLeave'
     },
 
+    /**
+     * Create the svg hexagon or circle with d3 based on the width, the height, the margin
+     * and the color of the component.
+     * Then, we update the pulse element and create the pulse animation if enabled.
+     */
+    attached: function() {
+
+      this._createSVGShape();
+
+      var width = this.width,
+          remainingHeight = 0;
+
+      if (this.type === 'hexagon') {
+        width = (Math.sqrt(3) / 2) * this.width;
+      }
+      remainingHeight = this.height - width;
+
+      this.$.pulse.style.marginTop = (remainingHeight / 2).toFixed(2) + 'px';
+      this.$.pulse.style.marginBottom = (remainingHeight / 2).toFixed(2) + 'px';
+
+
+      if (this.pulseAnimation) {
+        this._pulseAnimation = this.$.pulse.animate(this.pulseAnimationSteps, this.pulseAnimationTiming);
+      }
+    },
+
+    /**
+     * Called every time the tile is overed by the mouse.
+     * We update the pulse rate on over.
+     */
     _onMouseEnter: function () {
       if (this.displayTitleOnOver) {
         this._hasMouseOver = true;
+        this.updatePulseRate(this.pulseFasterOnOver);
       }
     },
 
+    /**
+     * Called every time the overing is finished.
+     * We reset the pulse rate.
+     * @return {[type]} [description]
+     */
     _onMouseLeave: function () {
       if (this.displayTitleOnOver) {
         this._hasMouseOver = false;
+        this.updatePulseRate();
       }
     },
 
-    _isOvered: function () {
-      return this.isPlain && this._hasMouseOver;
+    /**
+     * Update the pulse rate by changing the animation playback rate.
+     * @param  {Number} rate The animation rate. 1 is default.
+     */
+    updatePulseRate: function (rate) {
+      if (this._pulseAnimation) {
+        this._pulseAnimation.playbackRate = rate || 1;
+      }
     },
 
+    /**
+     * Update the title color.
+     */
     _computeSpanStyle: function () {
       return 'color: ' + this.textColor + ';';
     },
 
     /**
-     * Create the svg hexagon or circle with d3 based on the width, the height, the margin
-     * and the color of the component.
+     * Create and insert the SVG shape.
+     * It uses D3 to create the shape.
+     * We insert it using the regular Polymer DOM API.
      */
-    attached: function() {
+    _createSVGShape: function () {
       var width = this.width,
           radius,
           id = 'shape',
@@ -269,16 +434,13 @@ Example:
       if (this.type === 'hexagon') {
         attr = enter.attr('d', hexbin.hexagon(radius - this.margin));
       } else {
-        attr = enter.attr("cx", 0)
-          .attr("cy", 0)
-          .attr("r", radius - this.margin);
+        attr = enter.attr('cx', 0)
+          .attr('cy', 0)
+          .attr('r', radius - this.margin);
       }
       attr.style('fill', this.color);
 
-
       Polymer.dom(this.$.tile).insertBefore(svg.node(), this.$.anchor);
-
-      //optimization
       this.$.shape = this.$$('#' + id);
     },
 
@@ -334,6 +496,7 @@ Example:
       var eventName = 'tile-tap-' + ((this.isPlain) ? 'plain' : 'empty');
 
       this._hasMouseOver = false;
+      this.updatePulseRate(1);
 
       this.fire(eventName, {
         i: this.i,
